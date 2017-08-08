@@ -1,0 +1,727 @@
+> library(MASS)
+> data(Boston)
+> 
+> ppr.fit = ppr(log(medv) ~ ., data = Boston,
++               sm.method = "spline", max.terms = 6, nterms = 4)
+> 
+> summary(ppr.fit)
+Call:
+ppr(formula = log(medv) ~ ., data = Boston, sm.method = "spline", 
+    max.terms = 6, nterms = 4)
+
+Goodness of fit:
+  4 terms   5 terms   6 terms 
+10.693250  9.092397  8.836987 
+
+Projection direction vectors:
+        term 1        term 2        term 3        term 4       
+crim    -0.0370520082 -0.1081949867  0.0060155057  0.1073999809
+zn       0.0012639681 -0.0073099129 -0.0112703603  0.0166843864
+indus    0.0196922340 -0.1597540675 -0.0002669413 -0.2726386137
+chas     0.0680277739 -0.0587872627 -0.2636395443  0.1286293102
+nox     -0.9780488999 -0.0972456868 -0.1109742332 -0.3926429981
+rm       0.1558570475  0.3223854004  0.9256503774 -0.6180648835
+age      0.0011027490 -0.0341159634 -0.0069218953 -0.0174197590
+dis     -0.0585155931 -0.7662010410  0.0804193636 -0.4601136462
+rad      0.0273676029 -0.0061409811 -0.1724048989  0.2687732724
+tax     -0.0012089741 -0.0068533052  0.0026881622 -0.0056150734
+ptratio -0.0614400121 -0.2279814706 -0.0671846678  0.2704122395
+black    0.0004732047  0.0015952839 -0.0064664460  0.0128756852
+lstat   -0.0691959687  0.4534129754  0.1427779879  0.0597466240
+
+Coefficients of ridge terms:
+    term 1     term 2     term 3     term 4 
+0.41039000 0.08272864 0.10221946 0.11042041 
+
+Equivalent df for ridge terms:
+term 1 term 2 term 3 term 4 
+  5.07   4.92   5.07   4.96 
+> par(mfrow = c(2, 2))
+> plot(ppr.fit, cex.lab = 1.5)
+> RSS = sum(residuals(ppr.fit)^2)
+> RSS.null = sum((log(Boston$medv) - mean(log(Boston$medv)))^2)
+> R2 = 1 - RSS/RSS.null
+> 
+> RSS
+[1] 10.69325
+> RSS.null
+[1] 84.37649
+> R2
+[1] 0.8732674
+> library(earth)
+Loading required package: plotmo
+Loading required package: plotrix
+Loading required package: TeachingDemos
+> data(Boston)
+> mars.fit = earth(log(medv) ~ ., data = Boston,
++                  nk = 30, degree = 2)
+> 
+> summary(mars.fit)
+Call: earth(formula=log(medv)~., data=Boston, degree=2, nk=30)
+
+                                coefficients
+(Intercept)                       3.11661570
+h(rm-6.405)                       0.28199037
+h(307-tax)                        0.00141772
+h(tax-307)                        0.00028132
+h(19.2-ptratio)                   0.05280273
+h(ptratio-19.2)                  -0.03034024
+h(169.27-black)                  -0.00092109
+h(6.12-lstat)                     0.04406298
+h(lstat-6.12)                    -0.04706077
+h(7.99248-crim) * h(lstat-6.12)   0.00257008
+h(crim-7.99248) * h(lstat-6.12)  -0.00060203
+h(18.1-indus) * h(6.405-rm)      -0.01435831
+h(indus-18.1) * h(6.405-rm)      -0.07137565
+h(0.507-nox) * h(19.2-ptratio)   -0.41517824
+h(nox-0.507) * h(19.2-ptratio)   -0.21363856
+h(0.693-nox) * h(lstat-6.12)      0.16773220
+h(nox-0.693) * h(lstat-6.12)      0.13471968
+h(rm-6.405) * h(ptratio-19.1)    -0.21945476
+h(6.405-rm) * h(lstat-23.79)      0.03852452
+h(1.5894-dis) * h(tax-307)        0.00501669
+h(dis-1.5894) * h(tax-307)        0.00012707
+h(1.6102-dis) * h(lstat-6.12)    -0.07045524
+h(dis-1.6102) * h(lstat-6.12)    -0.00683825
+h(tax-403) * h(19.2-ptratio)     -0.00408825
+
+Selected 24 of 29 terms, and 9 of 13 predictors
+Termination condition: Reached nk 30
+Importance: lstat, rm, crim, dis, tax, ptratio, indus, nox, black, zn-unused, chas-unused, age-unused, ...
+Number of terms at each degree of interaction: 1 8 15
+GCV 0.02089449    RSS 8.269273    GRSq 0.875192    RSq 0.9019955
+> par(mfrow = c(2, 2))
+> plot(mars.fit)
+> library(nnet)
+> data(Boston)
+> 
+> nnet.fit = nnet(log(medv) ~ ., data = Boston, size = 6, 
++                 linout = TRUE, decay = 0.01, maxit = 500)
+# weights:  91
+initial  value 4292.013465 
+iter  10 value 60.548318
+iter  20 value 59.931717
+iter  30 value 45.901811
+iter  40 value 36.443742
+iter  50 value 26.053408
+iter  60 value 20.716540
+iter  70 value 18.605386
+iter  80 value 16.553365
+iter  90 value 15.185602
+iter 100 value 14.656354
+iter 110 value 14.515715
+iter 120 value 14.395770
+iter 130 value 14.226123
+iter 140 value 14.026131
+iter 150 value 13.578554
+iter 160 value 13.301772
+iter 170 value 13.039937
+iter 180 value 12.332931
+iter 190 value 11.612074
+iter 200 value 11.427145
+iter 210 value 11.408617
+iter 220 value 11.385013
+iter 230 value 11.317994
+iter 240 value 11.043069
+iter 250 value 10.677595
+iter 260 value 10.277692
+iter 270 value 9.995649
+iter 280 value 9.633876
+iter 290 value 9.417810
+iter 300 value 9.215241
+iter 310 value 9.130465
+iter 320 value 9.074377
+iter 330 value 8.982695
+iter 340 value 8.924620
+iter 350 value 8.908526
+iter 360 value 8.901713
+iter 370 value 8.900246
+iter 380 value 8.899860
+iter 390 value 8.899432
+iter 400 value 8.898996
+iter 410 value 8.892220
+iter 420 value 8.821114
+iter 430 value 8.745269
+iter 440 value 8.727956
+iter 450 value 8.720378
+iter 460 value 8.685668
+iter 470 value 8.575846
+iter 480 value 8.013787
+iter 490 value 7.493268
+iter 500 value 7.336273
+final  value 7.336273 
+stopped after 500 iterations
+> 
+> summary(nnet.fit)
+a 13-6-1 network with 91 weights
+options were - linear output units  decay=0.01
+  b->h1  i1->h1  i2->h1  i3->h1  i4->h1  i5->h1  i6->h1  i7->h1  i8->h1  i9->h1 i10->h1 i11->h1 i12->h1 
+  -0.08   -0.14   -0.34   -0.57    1.10   -0.06    0.95   -0.15    1.36    0.18    0.00   -1.09    0.07 
+i13->h1 
+   0.87 
+  b->h2  i1->h2  i2->h2  i3->h2  i4->h2  i5->h2  i6->h2  i7->h2  i8->h2  i9->h2 i10->h2 i11->h2 i12->h2 
+  -0.04    0.01    0.04    0.14    0.46   -0.19   -0.21   -0.04    0.13    1.04   -0.01   -0.17    0.02 
+i13->h2 
+  -0.08 
+  b->h3  i1->h3  i2->h3  i3->h3  i4->h3  i5->h3  i6->h3  i7->h3  i8->h3  i9->h3 i10->h3 i11->h3 i12->h3 
+  -0.02   -0.02    0.00   -0.24   -0.03   -0.01   -0.04   -0.12   -0.02    0.39   -0.09   -0.19    0.58 
+i13->h3 
+   0.38 
+  b->h4  i1->h4  i2->h4  i3->h4  i4->h4  i5->h4  i6->h4  i7->h4  i8->h4  i9->h4 i10->h4 i11->h4 i12->h4 
+  -1.92   -0.02   -0.02    0.12    0.15   -2.25    0.25    0.00    0.48    0.26    0.00   -0.35    0.00 
+i13->h4 
+  -0.13 
+  b->h5  i1->h5  i2->h5  i3->h5  i4->h5  i5->h5  i6->h5  i7->h5  i8->h5  i9->h5 i10->h5 i11->h5 i12->h5 
+   0.31   -0.08    0.27   -0.41    1.57   -1.16   -0.67    0.10   -4.02   -0.90   -0.06    3.46   -0.01 
+i13->h5 
+   0.03 
+  b->h6  i1->h6  i2->h6  i3->h6  i4->h6  i5->h6  i6->h6  i7->h6  i8->h6  i9->h6 i10->h6 i11->h6 i12->h6 
+  -1.62   -0.33    0.00   -0.07    0.05    0.12    1.00   -0.01   -0.27   -0.12    0.00    0.00   -0.01 
+i13->h6 
+   0.02 
+ b->o h1->o h2->o h3->o h4->o h5->o h6->o 
+ 0.94 -0.26  0.75  0.28  1.56  1.00  1.30 
+> RSS = sum(residuals(nnet.fit)^2)
+> RSS.null = sum((log(Boston$medv) - mean(log(Boston$medv)))^2)
+> R2 = 1 - RSS/RSS.null
+> 
+> RSS
+[1] 6.71583
+> RSS.null
+[1] 84.37649
+> R2
+[1] 0.9204064
+> library(nnet)
+> data(Boston)
+> 
+> nnet.fit = nnet(log(medv) ~ ., data = Boston, size = 6, 
++                 linout = TRUE, decay = 0.01, maxit = 500)
+# weights:  91
+initial  value 2891.705638 
+iter  10 value 85.228019
+iter  20 value 61.465417
+iter  30 value 51.742547
+iter  40 value 35.382436
+iter  50 value 30.960440
+iter  60 value 26.140681
+iter  70 value 21.984382
+iter  80 value 17.405537
+iter  90 value 15.729521
+iter 100 value 14.910992
+iter 110 value 13.552276
+iter 120 value 11.986935
+iter 130 value 10.686963
+iter 140 value 10.606636
+iter 150 value 10.525104
+iter 160 value 10.330832
+iter 170 value 9.809717
+iter 180 value 9.722708
+iter 190 value 9.718171
+iter 200 value 9.710190
+iter 210 value 9.658824
+iter 220 value 9.352224
+iter 230 value 8.761476
+iter 240 value 8.413661
+iter 250 value 8.067506
+iter 260 value 7.641194
+iter 270 value 7.493767
+iter 280 value 7.379513
+iter 290 value 7.295590
+iter 300 value 7.260936
+iter 310 value 7.248370
+iter 320 value 7.225051
+iter 330 value 7.205886
+iter 340 value 7.205058
+iter 350 value 7.200390
+iter 360 value 7.195465
+iter 370 value 7.178638
+iter 380 value 7.133775
+iter 390 value 7.113518
+iter 400 value 7.107051
+iter 410 value 7.105835
+iter 420 value 7.105675
+iter 430 value 7.089585
+iter 440 value 7.031088
+iter 450 value 7.024841
+iter 460 value 7.024358
+iter 470 value 7.024319
+final  value 7.024316 
+converged
+> 
+> summary(nnet.fit)
+a 13-6-1 network with 91 weights
+options were - linear output units  decay=0.01
+  b->h1  i1->h1  i2->h1  i3->h1  i4->h1  i5->h1  i6->h1  i7->h1  i8->h1  i9->h1 i10->h1 i11->h1 i12->h1 
+   0.22   -0.34    0.03    0.15    0.81    0.06    0.15   -0.03    0.15    1.24   -0.01    0.07    0.00 
+i13->h1 
+  -0.26 
+  b->h2  i1->h2  i2->h2  i3->h2  i4->h2  i5->h2  i6->h2  i7->h2  i8->h2  i9->h2 i10->h2 i11->h2 i12->h2 
+  -0.13    0.05    0.01   -0.06   -0.05   -0.62   -0.37    0.04   -0.27   -0.08   -0.01    0.02    0.02 
+i13->h2 
+   0.15 
+  b->h3  i1->h3  i2->h3  i3->h3  i4->h3  i5->h3  i6->h3  i7->h3  i8->h3  i9->h3 i10->h3 i11->h3 i12->h3 
+   0.09   -0.09    0.20    0.19    0.83   -2.24   -1.07    0.01   -0.31   -0.52    0.00    0.94    0.00 
+i13->h3 
+   0.00 
+  b->h4  i1->h4  i2->h4  i3->h4  i4->h4  i5->h4  i6->h4  i7->h4  i8->h4  i9->h4 i10->h4 i11->h4 i12->h4 
+  -0.03   -0.34    0.04    1.45    0.07   -0.06    0.39   -0.02   -0.43    0.08    0.01    0.18   -0.02 
+i13->h4 
+  -0.09 
+  b->h5  i1->h5  i2->h5  i3->h5  i4->h5  i5->h5  i6->h5  i7->h5  i8->h5  i9->h5 i10->h5 i11->h5 i12->h5 
+  -0.37   -0.09   -0.01   -0.09   -0.11    0.27    0.73   -0.01   -0.38   -0.20   -0.01   -0.16    0.00 
+i13->h5 
+   0.19 
+  b->h6  i1->h6  i2->h6  i3->h6  i4->h6  i5->h6  i6->h6  i7->h6  i8->h6  i9->h6 i10->h6 i11->h6 i12->h6 
+  -2.52    0.00    0.00    0.05   -0.01   -1.46    0.56   -0.01    0.01    0.10    0.00   -0.01    0.00 
+i13->h6 
+  -0.13 
+ b->o h1->o h2->o h3->o h4->o h5->o h6->o 
+ 0.03  0.73  1.25  1.09 -0.42  0.76  2.16 
+> RSS = sum(residuals(nnet.fit)^2)
+> RSS.null = sum((log(Boston$medv) - mean(log(Boston$medv)))^2)
+> R2 = 1 - RSS/RSS.null
+> 
+> RSS
+[1] 6.699405
+> RSS.null
+[1] 84.37649
+> R2
+[1] 0.9206011
+> library(caret)
+Loading required package: lattice
+Loading required package: ggplot2
+> my.grid = expand.grid(.decay = c(0.01, 0.001), .size = c(4, 6, 8))
+> nn.CV = train(log(medv) ~ ., data = Boston, 
++               method = "nnet", 
++               maxit = 1000,
++               tuneGrid = my.grid,
++               trace = FALSE,
++               linout = TRUE,
++               trControl = trainControl(method = "cv",
++                                        number = 5,
++                                        repeats = 100))
+> 
+> nn.CV
+Neural Network 
+
+506 samples
+ 13 predictor
+
+No pre-processing
+Resampling: Cross-Validated (5 fold) 
+Summary of sample sizes: 406, 404, 405, 404, 405 
+Resampling results across tuning parameters:
+
+  decay  size  RMSE       Rsquared 
+  0.001  4     0.2397091  0.6323185
+  0.001  6     0.2417523  0.7007975
+  0.001  8     0.2091612  0.7685993
+  0.010  4     0.1735611  0.8187007
+  0.010  6     0.1726704  0.8204527
+  0.010  8     0.2045752  0.7626342
+
+RMSE was used to select the optimal model using  the smallest value.
+The final values used for the model were size = 6 and decay = 0.01. 
+> ?rpart
+No documentation for ‘rpart’ in specified packages and libraries:
+you could try ‘??rpart’
+> x = sort(runif(100))
+> x
+  [1] 0.01367718 0.01787961 0.02246096 0.02941747 0.03488172 0.03552641 0.04452852 0.05087035 0.06095507
+ [10] 0.06340798 0.09091391 0.10194440 0.11420095 0.11581539 0.12786073 0.13421391 0.15140661 0.16574792
+ [19] 0.17044234 0.20450965 0.20818747 0.21527568 0.23215503 0.23742537 0.24848834 0.25023107 0.26554094
+ [28] 0.27315198 0.27694344 0.27995315 0.29839285 0.33284053 0.33558167 0.33795787 0.34126197 0.34581640
+ [37] 0.35444839 0.36051282 0.36623366 0.38272351 0.39247348 0.39316778 0.39493634 0.39661229 0.40303919
+ [46] 0.42568932 0.44188804 0.44238218 0.47906231 0.47963663 0.49136182 0.55469890 0.57629044 0.58029818
+ [55] 0.58590207 0.59006021 0.59357000 0.59709937 0.59922502 0.60990594 0.61115701 0.61360483 0.62759680
+ [64] 0.64680469 0.65384480 0.66197033 0.66495535 0.66770859 0.67137872 0.67442105 0.69265608 0.70100220
+ [73] 0.72444224 0.73780438 0.74570573 0.77313105 0.78828508 0.79161245 0.79441932 0.84241311 0.84253328
+ [82] 0.85820805 0.86307148 0.87015794 0.87203807 0.87679976 0.89423311 0.89549187 0.91020381 0.91372927
+ [91] 0.91393802 0.92945414 0.93134559 0.94188371 0.95733104 0.96995038 0.97166581 0.97211939 0.98018642
+[100] 0.98519735
+> ?rnorm
+> y = 1 + 0.5 * x + 2 * x^2 + 0.5 * rnorm(100)
+> y
+  [1] 0.5307830 0.6532932 0.8503735 2.0286855 1.8438957 1.6577829 1.1951894 1.1193829 1.7276645 1.6352282
+ [11] 0.6972366 1.0930372 1.0099393 0.2444501 0.7373104 0.4098924 1.8220545 1.4123146 1.2626159 0.9110247
+ [21] 1.2420541 0.8190375 1.0699089 1.2707385 1.0241115 1.5749435 1.3125856 1.4874203 1.9934350 1.7729028
+ [31] 1.9178651 1.9795849 1.7822928 1.8772047 1.1973332 1.6513957 1.2283109 0.4989234 1.7585738 2.0427489
+ [41] 1.1008773 2.0559111 1.6214080 2.0660873 1.6809037 1.1698199 1.4029951 1.4316029 2.1099514 1.1012840
+ [51] 1.8254829 1.9910704 2.1276075 2.3989988 3.1418235 2.0109070 2.1639892 1.8361985 2.0145198 2.4141637
+ [61] 2.1085355 1.9854687 1.9140885 2.3079182 2.4720128 1.8451136 1.8049847 1.4705533 2.9430566 2.0614311
+ [71] 3.3620253 2.2841288 2.8146806 2.7128878 2.5081214 2.5556764 3.1157371 3.0862691 2.0581417 2.0554715
+ [81] 2.6372039 3.1643338 2.8318332 2.6714195 3.3017475 3.3802498 2.4503426 3.6386124 2.8910097 3.4723697
+ [91] 2.9589736 4.3956500 3.5383301 3.4613183 2.7593614 3.0560977 3.0623934 3.3693585 3.7926223 2.8635460
+> stuff = rpart(y ~ x, cp = 0.08)
+Error: could not find function "rpart"
+> library(rpart)
+Warning message:
+package ‘rpart’ was built under R version 3.3.3 
+> stuff = rpart(y ~ x, cp = 0.08)
+> ?rpart
+> par(mfrow = c(1, 3))
+> ?plot
+> par(mfrow = c(1, 3))
+> plot(x, y, pch = 19, cex = 1.3, cex.lab = 1.4, cex.axis = 1.4)
+> abline(h = mean(y), lwd = 2, col = "blue")
+> ?abline
+> abline(v = stuff$splits[1, 4], lty = 2, lwd = 2, col = "red")
+> stuff$splits
+  count ncat   improve     index adj
+x   100   -1 0.5943572 0.6695437   0
+x    68   -1 0.3436118 0.2750477   0
+> R1 = x < stuff$splits[1, 4]
+> Rq
+Error: object 'Rq' not found
+> R1
+  [1]  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
+ [18]  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
+ [35]  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
+ [52]  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
+ [69] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+ [86] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+> m1 = mean(y[R1])
+> m2 = mean(y[!R1])
+> m1
+[1] 1.557615
+> m2
+[1] 2.9767
+> y[R1]
+ [1] 0.5307830 0.6532932 0.8503735 2.0286855 1.8438957 1.6577829 1.1951894 1.1193829 1.7276645 1.6352282
+[11] 0.6972366 1.0930372 1.0099393 0.2444501 0.7373104 0.4098924 1.8220545 1.4123146 1.2626159 0.9110247
+[21] 1.2420541 0.8190375 1.0699089 1.2707385 1.0241115 1.5749435 1.3125856 1.4874203 1.9934350 1.7729028
+[31] 1.9178651 1.9795849 1.7822928 1.8772047 1.1973332 1.6513957 1.2283109 0.4989234 1.7585738 2.0427489
+[41] 1.1008773 2.0559111 1.6214080 2.0660873 1.6809037 1.1698199 1.4029951 1.4316029 2.1099514 1.1012840
+[51] 1.8254829 1.9910704 2.1276075 2.3989988 3.1418235 2.0109070 2.1639892 1.8361985 2.0145198 2.4141637
+[61] 2.1085355 1.9854687 1.9140885 2.3079182 2.4720128 1.8451136 1.8049847 1.4705533
+> y[!R1]
+ [1] 2.943057 2.061431 3.362025 2.284129 2.814681 2.712888 2.508121 2.555676 3.115737 3.086269 2.058142
+[12] 2.055472 2.637204 3.164334 2.831833 2.671420 3.301747 3.380250 2.450343 3.638612 2.891010 3.472370
+[23] 2.958974 4.395650 3.538330 3.461318 2.759361 3.056098 3.062393 3.369358 3.792622 2.863546
+> lines(c(-1, stuff$splits[1, 4]), c(m1, m1), col = "blue", lwd = 2)
+> lines(c(stuff$splits[1, 4], 1.1), c(m2, m2), col = "blue", lwd = 2)
+> R2 = x < stuff$splits[2, 4]
+> plot(x, y, pch = 19, cex = 1.3, cex.lab = 1.4, cex.axis = 1.4)
+> abline(v = stuff$splits[1, 4], lty = 2, lwd = 2, col = "red")
+> abline(v = stuff$splits[2, 4], lty = 2, lwd = 2, col = "red")
+> m1 = mean(y[R1])
+> m2 = mean(y[R2 & !R1])
+> m3 = mean(y[R2])
+> 
+> lines(c(-1, stuff$splits[1, 4]), c(m1, m1), col = "blue", lwd = 2)
+> lines(c(stuff$splits[1, 4], stuff$splits[2, 4]), c(m2, m2), col = "blue", lwd = 2)
+> lines(c(stuff$splits[2, 4], 1.1), c(m3, m3), col = "blue", lwd = 2)
+> m1 = mean(y[R1])
+> m2 = mean(y[R2 & !R1])
+> m3 = mean(y[!R2])
+> 
+> lines(c(-1, stuff$splits[1, 4]), c(m1, m1), col = "blue", lwd = 2)
+> lines(c(stuff$splits[1, 4], stuff$splits[2, 4]), c(m2, m2), col = "blue", lwd = 2)
+> lines(c(stuff$splits[2, 4], 1.1), c(m3, m3), col = "blue", lwd = 2)
+> par(mfrow = c(1, 1))
+> plot(stuff, branch = 0, lwd = 2, uniform = TRUE)
+> text(stuff, cex = 1.5, col = "blue")
+> text(stuff, cex = 1.4, col = "blue")
+> par(mfrow = c(1, 1))
+> plot(stuff, branch = 0, lwd = 2, uniform = TRUE)
+> text(stuff, cex = 1.5, col = "blue")
+> library(R330)
+Loading required package: s20x
+Loading required package: leaps
+Loading required package: rgl
+
+Attaching package: ‘rgl’
+
+The following object is masked from ‘package:plotrix’:
+
+    mtext3d
+
+> data(cherry.df)
+> head(cherry.df)
+  diameter height volume
+1      8.3     70   10.3
+2      8.6     65   10.3
+3      8.8     63   10.2
+4     10.5     72   16.4
+5     10.7     81   18.8
+6     10.8     83   19.7
+> 
+> library(rpart)
+> my.fit = rpart(volume ~ height + diameter,
++                data = cherry.df,
++                cp = 0.001, minsplit = 7)
+> plot(my.fit, lwd = 2, col = "red",
++      branch = 0, uniform = TRUE)
+> text(my.fit, col = "darkblue", cex = 1.3)
+> RSS.tree = sum((cherry.df$volume - predict(my.fit))^2)
+> 
+> my.fit.lm = lm(volume ~ height + diameter, 
++                data = cherry.df)
+> RSS.lm = sum((cherry.df$volume - predict(my.fit.lm))^2)
+> 
+> par(mfrow = c(1, 1))
+> h.range = range(cherry.df$height)
+> d.range = range(cherry.df$diameter)
+> 
+> plot(d.range, h.range, type = "n",
++      xlab = "Diameter", ylab = "Height",
++      cex.axis = 1.3, cex.main = 1.4,
++      cex.lab = 1.3, main = "First split")
+> 
+> x1 = c(7.5, 16.15, 16.15, 7.5)
+> x2 = c(16.15, 21.1, 21.1, 16.15)
+> y1 = c(58, 58, 92, 92)
+> y2 = c(58, 58, 92, 92)
+> 
+> my.cols = terrain.colors(8)
+> polygon(x1, y1, col = my.cols[1])
+> polygon(x2, y2, col = my.cols[4])
+> lines(c(16.15, 16.15), h.range + c(-5, 5), lwd = 2)
+> box(lwd = 2)
+> points(cherry.df$diameter, cherry.df$height,
++        pch = 19, col = "red", cex = 1.3)
+> 
+> mypos = rep(4, 31)
+> mypos[28] = 2
+> mypos[8] = 3
+> 
+> text(cherry.df$diameter, cherry.df$height,
++      cherry.df$volume, pos = mypos, cex = 0.8)
+> R1 = cherry.df$diameter < 16.15
+> R2 = cherry.df$diameter < 12.45
+> m1 = round(mean(cherry.df$volume[R2]), 2)
+> m2 = round(mean(cherry.df$volume[!R2 & R1]), 2)
+> m3 = round(mean(cherry.df$volume[!R1]), 2)
+> 
+> text(10, 75, m1, col = "darkblue", cex = 1.3)
+> text(14, 75, m2, col = "darkblue", cex = 1.3)
+> text(18.5, 75, m3, col = "darkblue", cex = 1.3)
+> R1 = cherry.df$diameter < 16.15
+> m1 = mean(cherry.df$volume[R1])
+> m2 = mean(cherry.df$volume[!R1])
+> 
+> text(10, 75, m1, col = "darkblue", cex = 1.3)
+> text(18.5, 75, m2, col = "darkblue", cex = 1.3)
+> library(rpart)
+> my.fit = rpart(volume ~ height + diameter,
++                data = cherry.df,
++                cp = 0.001, minsplit = 7)
+> plot(my.fit, lwd = 2, col = "red",
++      branch = 0, uniform = TRUE)
+> text(my.fit, col = "darkblue", cex = 1.3)
+> 
+> RSS.tree = sum((cherry.df$volume - predict(my.fit))^2)
+> 
+> my.fit.lm = lm(volume ~ height + diameter, 
++                data = cherry.df)
+> RSS.lm = sum((cherry.df$volume - predict(my.fit.lm))^2)
+> 
+> par(mfrow = c(1, 1))
+> 
+> h.range = range(cherry.df$height)
+> d.range = range(cherry.df$diameter)
+> 
+> plot(d.range, h.range, type = "n",
++      xlab = "Diameter", ylab = "Height",
++      cex.axis = 1.3, cex.main = 1.4,
++      cex.lab = 1.3, main = "First split")
+>   
+> x1 = c(7.5, 16.15, 16.15, 7.5)
+> x2 = c(16.15, 21.1, 21.1, 16.15)
+> y1 = c(58, 58, 92, 92)
+> y2 = c(58, 58, 92, 92)
+> 
+> my.cols = terrain.colors(8)
+> polygon(x1, y1, col = my.cols[1])
+> polygon(x2, y2, col = my.cols[4])
+> lines(c(16.15, 16.15), h.range + c(-5, 5), lwd = 2)
+> box(lwd = 2)
+> 
+> points(cherry.df$diameter, cherry.df$height,
++        pch = 19, col = "red", cex = 1.3)
+> 
+> mypos = rep(4, 31)
+> mypos[28] = 2
+> mypos[8] = 3
+> 
+> text(cherry.df$diameter, cherry.df$height,
++      cherry.df$volume, pos = mypos, cex = 0.8)
+> 
+> R1 = cherry.df$diameter < 16.15
+> m1 = mean(cherry.df$volume[R1])
+> m2 = mean(cherry.df$volume[!R1])
+> 
+> text(10, 75, m1, col = "darkblue", cex = 1.3)
+> text(18.5, 75, m2, col = "darkblue", cex = 1.3)
+> plot(d.range, h.range, type = "n",
++      xlab = "Diameter", ylab = "Height",
++      cex.axis = 1.3, cex.main = 1.4,
++      cex.lab = 1.3, main = "Second split")
+> x1 = c(12.45,16.15,16.15, 12.45)
+> x2 = c(16.15,21.1, 21.1,16.15)
+> x3 = c(7.5,12.45,12.45,7.5)
+> y1 = c(58,58,92,92)
+> y2 = c(58,58,92,92)
+> y3 = c(58,58,92,92)
+> 
+> polygon(x1, y1, col = my.cols[3])
+> polygon(x2, y2, col = my.cols[4])
+> polygon(x3, y3, col = my.cols[1])
+> lines(c(12.45, 12.45), h.range + c(-5, 5), lwd = 2)
+> lines(c(16.15, 16.15), h.range + c(-5, 5), lwd = 2)
+> box(lwd = 2)
+> points(cherry.df$diameter, cherry.df$height,
++        pch = 19, col = "red", cex = 1.3)
+> 
+> mypos = rep(4, 31)
+> mypos[28] = 2
+> mypos[8] = 3
+> 
+> text(cherry.df$diameter, cherry.df$height,
++      cherry.df$volume, pos = mypos, cex = 0.8)
+> 
+> R1 = cherry.df$diameter < 16.15
+> R2 = cherry.df$diameter < 12.45
+> m1 = round(mean(cherry.df$volume[R2]), 2)
+> m2 = round(mean(cherry.df$volume[!R2 & R1]), 2)
+> m3 = round(mean(cherry.df$volume[!R1]), 2)
+> text(10, 75, m1, col = "darkblue", cex = 1.3)
+> text(14, 75, m2, col = "darkblue", cex = 1.3)
+> text(18.5, 75, m3, col = "darkblue", cex = 1.3)
+> plot(d.range, h.range, type="n", 
++      xlab = "Diameter",ylab = "Height", 
++      cex.axis=1.3, cex.main = 1.4, cex.lab = 1.3,main = "Final split")
+> 
+> x1 = c(7.5,9.65,9.65, 7.5)
+> x2 = c(9.65, 11.05,11.05,9.65)
+> x3 = c(11.05, 12.45,12.45,11.05)
+> x4 = c(11.05, 12.45,12.45,11.05)
+> x5 = c(12.45,13.90,13.90,12.45)
+> x6 = c(13.90,16.50,16.50,13.90)
+> x7 = c(16.15,21.1,21.1,16.15)
+> x8 =  c(16.15,21.1 ,21.1,16.15)
+> 
+> 
+> y1 = c(58,58,92,92)
+> y2 = c(58,58,92,92)
+> y3 = c(58,58,77.05,77.05)
+> y4 = c(77.05,77.05,92,92)
+> y5 = c(58,58,92,92)
+> y6 = c(58,58,92,92)
+> y7 = c(58,58,81.5,81.5)
+> y8 = c(81.5,81.5,92,92)
+> 
+> 
+> my.cols = terrain.colors(8)
+> polygon(x1, y1, col = my.cols[1])
+> polygon(x2, y2, col = my.cols[2])
+> polygon(x3, y3, col = my.cols[3])
+> polygon(x4, y4, col = my.cols[4])
+> polygon(x5, y5, col = my.cols[5])
+> polygon(x6, y6, col = my.cols[6])
+> polygon(x7, y7, col = my.cols[7])
+> polygon(x8, y8, col = my.cols[8])
+> box()
+> lines(c(9.65, 9.65), h.range + c(-5, 5), lwd = 2)
+> lines(c(11.05, 11.05), h.range + c(-5, 5), lwd = 2)
+> lines(c(11.05, 12.45), c(77.05, 77.05), lwd = 2)
+> lines(c(12.45, 12.45), h.range + c(-5, 5), lwd = 2)
+> lines(c(13.90, 13.90), h.range + c(-5, 5), lwd = 2)
+> lines(c(16.15, 16.15), h.range + c(-5, 5), lwd = 2)
+> lines(c(16.15, max(h.range) + 5), c(81.5, 81.5),lwd = 2)
+> box(lwd = 2)
+> points(cherry.df$diameter, cherry.df$height,
++        pch = 19, col = "red", cex = 1.3)
+> 
+> mypos = rep(4, 31)
+> mypos[28] = 2
+> mypos[8] = 3
+> 
+> text(cherry.df$diameter, cherry.df$height,
++      cherry.df$volume, pos = mypos, cex = 0.8)
+> text( 8.70, 75,  10.27, col="darkblue", cex=1.3)
+> text(10.35,75,  17.74, col="darkblue", cex=1.3)
+> text(11.75,83,  23.40, col="darkblue", cex=1.3)
+> text(11.75,70.5,20.54, col="darkblue", cex=1.3)
+> text(13.17,75,  26.80, col="darkblue", cex=1.3)
+> text(15.00,75,  35.20, col="darkblue", cex=1.3)
+> text(18.60,84,  66.35, col="darkblue", cex=1.3)
+> text(18.60,70.5,51.76, col="darkblue", cex=1.3)
+> RSS.tree = sum(residuals(my.fit)^2)
+> my.fit.lm = lm(volume ~ height + diameter,
++                data = cherry.df)
+> RSS.lm = sum(residuals(my.fit.lm)^2)
+> sum(residuals(my.fit)^2)
+[1] 483.1677
+> RSS.lm
+[1] 421.9214
+> RSS.tree
+[1] 483.1677
+> my.fit = rpart(volume ~ height + diameter, 
++                data = cherry.df,
++                cp = 0.002,
++                minsplit = 7)
+> plot(my.fit, lwd = 2, col = "red", branch = 0, uniform = TRUE)
+> text(my.fit, col = "darkblue", cex = 2)
+> library(MASS)
+> data(Boston)
+> library(rpart)
+> tree.fit = rpart(medv ~ ., data = Boston,
++                  cp = 0.005, minsplit = 5)
+> 
+> plotcp(tree.fit)
+> abline(v = 9, lty = 2, col = "blue", lwd = 2)
+> abline(v = 7, lty = 2, col = "blue", lwd = 2)
+> printcp(tree.fit)
+
+Regression tree:
+rpart(formula = medv ~ ., data = Boston, cp = 0.005, minsplit = 5)
+
+Variables actually used in tree construction:
+[1] crim    dis     lstat   nox     ptratio rm     
+
+Root node error: 42716/506 = 84.42
+
+n= 506 
+
+          CP nsplit rel error  xerror     xstd
+1  0.4527442      0   1.00000 1.00348 0.082982
+2  0.1711724      1   0.54726 0.65679 0.058973
+3  0.0716578      2   0.37608 0.45437 0.051464
+4  0.0590015      3   0.30443 0.39477 0.046097
+5  0.0337559      4   0.24542 0.32803 0.040145
+6  0.0266130      5   0.21167 0.29767 0.039966
+7  0.0235724      6   0.18506 0.28964 0.039837
+8  0.0108593      7   0.16148 0.23989 0.033284
+9  0.0074304      8   0.15062 0.22470 0.031298
+10 0.0072654      9   0.14319 0.21649 0.030721
+11 0.0070714     10   0.13593 0.21597 0.030729
+12 0.0061263     11   0.12886 0.21056 0.030426
+13 0.0050000     12   0.12273 0.20989 0.030416
+> subtree.fit = rpart(medv ~ ., data = Boston,
++                     cp = 0.009, minsplit = 5)
+> printcp(subtree.fit)
+
+Regression tree:
+rpart(formula = medv ~ ., data = Boston, cp = 0.009, minsplit = 5)
+
+Variables actually used in tree construction:
+[1] crim    dis     lstat   ptratio rm     
+
+Root node error: 42716/506 = 84.42
+
+n= 506 
+
+        CP nsplit rel error  xerror     xstd
+1 0.452744      0   1.00000 1.00451 0.083025
+2 0.171172      1   0.54726 0.60699 0.057942
+3 0.071658      2   0.37608 0.41914 0.047355
+4 0.059002      3   0.30443 0.37078 0.045367
+5 0.033756      4   0.24542 0.27675 0.029793
+6 0.026613      5   0.21167 0.25289 0.029009
+7 0.023572      6   0.18506 0.22535 0.026317
+8 0.010859      7   0.16148 0.20288 0.024752
+9 0.009000      8   0.15062 0.19066 0.022636
+> plot(subtree.fit, branch = 0, uniform = TRUE)
+> text(subtree.fit, cex = 2, col = "blue")
+> 
