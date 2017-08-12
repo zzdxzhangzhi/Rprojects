@@ -145,16 +145,56 @@ rat.approx2(cf)
 
 cf.expand2 = function(x, n = 5) {
   cf = numeric(n)
-  if (n == 1)
-    cf[n] = round(x)
-  else
-    cf[n] = cf.expand2(x - cf[n-1],)
-  for (i in 1:n) {
-    cf[i] = round(x)
-    delta = x - cf[i]
-    x = 1 / delta
+  cf[1] = round(x)
+  if (n > 1) {
+    delta = x - cf[1]
+    x =  1 / delta
+    cf[2:n] = cf.expand2(x, n - 1)
   }
   cf
 }
 
+cf = cf.expand2(pi, 2)
+rat.approx2(cf)
+cf = cf.expand2(pi, 3)
+rat.approx2(cf)
+
+rat.approx3 = function(cf) {
+  n = length(cf)
+  num = cf[n]
+  init = 0
+  den = 1
+  if (n > 1) {
+    if (cf[n - 1] < 0)
+      factor = -1
+    else
+      factor = 1
+    prev_appr = rat.approx3(cf[1:(n-1)])
+    tmp = num
+    if (n > 2) {
+      prev_prev_appr = rat.approx3(cf[1:(n-2)])
+      den = prev_prev_appr[1]
+      init = prev_prev_appr[2]
+    }
+    num = prev_appr[1] * tmp + factor * den
+    den = prev_appr[2] * tmp + factor * init
+  }
+  
+  if (den > 0) 
+    c(num, den)
+  else
+    c(-num, -den)
+}
+
+rat.approx3(cf)
+
+cf = cf.expand2(pi, 7)
+rat.approx3(cf)
+
+cf = cf.expand2(pi, 7)
+rat.approx2(cf)
+rat.approx3(cf)
+
+cf = cf.expand(pi, 7)
+rat.approx(pi, 7)
 
